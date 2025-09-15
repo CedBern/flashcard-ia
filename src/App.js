@@ -174,6 +174,21 @@ function App() {
   const [sessionStart, setSessionStart] = useState(Date.now());
   const [cardStartTime, setCardStartTime] = useState(Date.now());
 
+  // État pour les notifications toast
+  const [notifications, setNotifications] = useState([]);
+
+  // Fonction pour afficher une notification toast
+  const showNotification = (message, type = 'info', duration = 3000) => {
+    const id = Date.now();
+    const notification = { id, message, type };
+    
+    setNotifications(prev => [...prev, notification]);
+    
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, duration);
+  };
+
   // États pour le nouveau/édition de carte
   const [newCard, setNewCard] = useState({
     type: 'vocabulary',
@@ -412,10 +427,10 @@ function App() {
   const filteredCards = getFilteredCards();
   const currentCard = filteredCards[currentIndex];
 
-  // Ajouter ou éditer une carte
+  // Ajouter ou éditer une carte avec notifications
   const saveCard = () => {
     if (!newCard.french || !newCard.translations.english) {
-      alert('Veuillez remplir au moins le français et l\'anglais');
+      showNotification('Veuillez remplir au moins le français et l\'anglais', 'warning');
       return;
     }
 
@@ -425,12 +440,14 @@ function App() {
           ? { ...newCard, id: editingCard.id }
           : card
       ));
+      showNotification('Carte modifiée avec succès ! ✏️', 'success');
     } else {
       const newCardWithId = {
         ...newCard,
         id: Date.now()
       };
       setCards([...cards, newCardWithId]);
+      showNotification('Nouvelle carte ajoutée ! 🎉', 'success');
     }
 
     resetForm();
@@ -454,11 +471,14 @@ function App() {
     setShowAddModal(false);
   };
 
-  // Supprimer une carte
+  // Supprimer une carte avec confirmation
   const deleteCard = (id) => {
-    setCards(cards.filter(card => card.id !== id));
-    if (currentIndex >= cards.length - 1) {
-      setCurrentIndex(Math.max(0, currentIndex - 1));
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette carte ?')) {
+      setCards(cards.filter(card => card.id !== id));
+      if (currentIndex >= cards.length - 1) {
+        setCurrentIndex(Math.max(0, currentIndex - 1));
+      }
+      showNotification('Carte supprimée', 'info');
     }
   };
 
@@ -469,24 +489,35 @@ function App() {
     setShowAddModal(true);
   };
 
-  // Génération automatique avec IA - Version optimisée
+  // Génération automatique avec IA - Version optimisée avec notifications
   const generateWithAI = async () => {
     if (!newCard.french) {
-      alert('Veuillez entrer le texte en français d\'abord');
+      showNotification('Veuillez entrer le texte en français d\'abord', 'warning');
       return;
     }
 
     setIsGenerating(true);
+    showNotification('Génération en cours...', 'info', 1000);
     
     try {
       // Traduction vers l'anglais avec MyMemory
       const urlEn = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(newCard.french)}&langpair=fr|en`;
       const responseEn = await fetch(urlEn);
+      
+      if (!responseEn.ok) {
+        throw new Error(`Erreur API: ${responseEn.status}`);
+      }
+      
       const dataEn = await responseEn.json();
       
       // Traduction vers l'espagnol avec MyMemory
       const urlEs = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(newCard.french)}&langpair=fr|es`;
       const responseEs = await fetch(urlEs);
+      
+      if (!responseEs.ok) {
+        throw new Error(`Erreur API: ${responseEs.status}`);
+      }
+      
       const dataEs = await responseEs.json();
       
       if (dataEn.responseData && dataEs.responseData) {
@@ -499,10 +530,17 @@ function App() {
             spanishSpain: dataEs.responseData.translatedText
           }
         });
+        showNotification('Traductions générées avec succès ! ✨', 'success');
+      } else {
+        throw new Error('Données de traduction invalides');
       }
     } catch (error) {
       console.error('Erreur génération:', error);
-      alert('Erreur lors de la génération. Veuillez réessayer.');
+      showNotification(
+        `Erreur lors de la génération: ${error.message}. Veuillez réessayer.`, 
+        'error', 
+        5000
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -930,11 +968,20 @@ function App() {
               {/* Bouton génération IA */}
               <button 
                 onClick={generateWithAI} 
-                className="btn-ai"
+                className={`btn-ai ${isGenerating ? 'pulse-animation' : ''}`}
                 disabled={isGenerating || !newCard.french}
               >
-                <Wand2 size={16} />
-                {isGenerating ? 'Génération...' : 'Générer avec IA'}
+                {isGenerating ? (
+                  <>
+                    <div className="loading-spinner"></div>
+                    Génération...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 size={16} />
+                    Générer avec IA
+                  </>
+                )}
               </button>
 
               {/* Traductions */}
@@ -1188,6 +1235,18 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* Notifications Toast */}
+      {notifications.map(notification => (
+        <div 
+          key={notification.id}
+          className={`toast ${notification.type} notification-slide-in`}
+        >
+          <div className="toast-content">
+            <span className="toast-message">{notification.message}</span>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

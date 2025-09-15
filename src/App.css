@@ -13,6 +13,8 @@
   --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
   --border-radius: 16px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.15s ease-out;
+  --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 * {
@@ -280,6 +282,11 @@ button {
   perspective: 1500px;
   width: 100%;
   max-width: 600px;
+  transition: transform 0.2s ease-out;
+}
+
+.card-container:hover {
+  transform: scale(1.02);
 }
 
 /* Flashcard - The main card that flips */
@@ -1248,4 +1255,205 @@ kbd {
     padding: 0.4rem;
     font-size: 0.75rem;
   }
+}
+
+/* ===== ANIMATIONS ET LOADING STATES ===== */
+
+/* Loading spinner pour l'IA */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 2px solid var(--primary-color);
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Animation de pulsation pour les boutons en attente */
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+/* Animation de succès */
+.success-animation {
+  animation: bounceIn 0.6s ease-out;
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Animation de retournement de carte améliorée */
+.card-flip-enter {
+  transform: rotateY(-90deg);
+  opacity: 0.5;
+}
+
+.card-flip-enter-active {
+  transform: rotateY(0deg);
+  opacity: 1;
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Animation de glissement pour les notifications */
+.notification-slide-in {
+  animation: slideInFromTop 0.4s ease-out forwards;
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.notification-slide-out {
+  animation: slideOutToTop 0.3s ease-in forwards;
+}
+
+@keyframes slideOutToTop {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+/* Amélioration des états de hover avec micro-interactions */
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: var(--transition-fast);
+}
+
+.btn:active {
+  transform: translateY(0);
+  transition: var(--transition-fast);
+}
+
+/* Toast notifications améliorées */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  padding: 1rem 1.5rem;
+  border-left: 4px solid var(--success-color);
+  z-index: 1000;
+  max-width: 400px;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-out;
+}
+
+.toast.show {
+  transform: translateX(0);
+}
+
+.toast.error {
+  border-left-color: var(--danger-color);
+}
+
+.toast.warning {
+  border-left-color: var(--warning-color);
+}
+
+.toast.info {
+  border-left-color: var(--primary-color);
+}
+
+/* Loading state pour les cartes */
+.card-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Amélioration des transitions de modal */
+.modal-backdrop {
+  transition: opacity 0.3s ease-out;
+}
+
+.modal-content {
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.modal-enter {
+  opacity: 0;
+}
+
+.modal-enter .modal-content {
+  transform: scale(0.8) translateY(-50px);
+}
+
+.modal-enter-active {
+  opacity: 1;
+}
+
+.modal-enter-active .modal-content {
+  transform: scale(1) translateY(0);
 }

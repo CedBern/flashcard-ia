@@ -88,6 +88,57 @@ const Flag = ({ country, size = 24 }) => {
 
 // Composant principal de l'application
 function App() {
+  // ==========================================
+  // FONCTIONS DE SAUVEGARDE SÉCURISÉE DES STATISTIQUES
+  // ==========================================
+  const validateStats = (stats) => {
+    return {
+      cardsViewed: Number(stats.cardsViewed) || 0,
+      cardsReviewed: Number(stats.cardsReviewed) || 0,
+      totalStudyTime: Number(stats.totalStudyTime) || 0,
+      streakDays: Number(stats.streakDays) || 0,
+      averageResponseTime: Number(stats.averageResponseTime) || 0,
+      totalCards: Number(stats.totalCards) || 0,
+      lastStudyDate: stats.lastStudyDate || null,
+      cardStats: stats.cardStats || {},
+      dailyStats: stats.dailyStats || {}
+    };
+  };
+
+  const loadStatsSecurely = () => {
+    try {
+      const saved = localStorage.getItem('fleStats');
+      if (saved) {
+        return validateStats(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.error('Erreur chargement stats:', error);
+    }
+    
+    return {
+      cardsViewed: 0,
+      cardsReviewed: 0,
+      totalStudyTime: 0,
+      streakDays: 0,
+      averageResponseTime: 0,
+      totalCards: 0,
+      lastStudyDate: null,
+      cardStats: {},
+      dailyStats: {}
+    };
+  };
+
+  const saveStatsSecurely = (stats) => {
+    try {
+      const validatedStats = validateStats(stats);
+      localStorage.setItem('fleStats', JSON.stringify(validatedStats));
+      return true;
+    } catch (error) {
+      console.error('Erreur sauvegarde stats:', error);
+      return false;
+    }
+  };
+
   // Charger les cartes depuis localStorage
   const loadCards = () => {
     const saved = localStorage.getItem('fleCards');
@@ -146,56 +197,7 @@ function App() {
     return diffDays === 1;
   };
 
-  // ==========================================
-  // FONCTIONS DE SAUVEGARDE SÉCURISÉE DES STATISTIQUES
-  // ==========================================
-  const validateStats = (stats) => {
-    return {
-      cardsViewed: Number(stats.cardsViewed) || 0,
-      cardsReviewed: Number(stats.cardsReviewed) || 0,
-      totalStudyTime: Number(stats.totalStudyTime) || 0,
-      streakDays: Number(stats.streakDays) || 0,
-      averageResponseTime: Number(stats.averageResponseTime) || 0,
-      totalCards: Number(stats.totalCards) || 0,
-      lastStudyDate: stats.lastStudyDate || null,
-      cardStats: stats.cardStats || {},
-      dailyStats: stats.dailyStats || {}
-    };
-  };
-
-  const saveStatsSecurely = (stats) => {
-    try {
-      const validatedStats = validateStats(stats);
-      localStorage.setItem('fleStats', JSON.stringify(validatedStats));
-      return true;
-    } catch (error) {
-      console.error('Erreur sauvegarde stats:', error);
-      return false;
-    }
-  };
-
-  const loadStatsSecurely = () => {
-    try {
-      const saved = localStorage.getItem('fleStats');
-      if (saved) {
-        return validateStats(JSON.parse(saved));
-      }
-    } catch (error) {
-      console.error('Erreur chargement stats:', error);
-    }
-    
-    return {
-      cardsViewed: 0,
-      cardsReviewed: 0,
-      totalStudyTime: 0,
-      streakDays: 0,
-      averageResponseTime: 0,
-      totalCards: 0,
-      lastStudyDate: null,
-      cardStats: {},
-      dailyStats: {}
-    };
-  };
+  // Fonctions de tracking des statistiques
 
   // Fonctions de tracking des statistiques
   const updateStats = (action, data = {}) => {

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLE Flashcards - Aperçu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1f2937;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .demo-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: perspective(1000px) rotateY(0deg);
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+        
+        .demo-card:hover {
+            transform: perspective(1000px) rotateY(5deg);
+        }
+        
+        .card-type {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #6366f1;
+        }
+        
+        .card-image {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+        }
+        
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .card-content h2 {
+            font-size: 2rem;
+            margin: 1rem 0;
+            color: #1f2937;
+            font-weight: 700;
+        }
+        
+        .card-notes {
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+        
+        .features {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem 2rem;
+            margin-top: 2rem;
+        }
+        
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature {
+            text-align: center;
+        }
+        
+        .feature h3 {
+            color: #6366f1;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        
+        .cta {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 2rem;
+            border-radius: 16px;
+        }
+        
+        .cta h2 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .cta p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: white;
+            color: #6366f1;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+                    <path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M16 22l2-2M17 14l5 5M21 14l-5 5"/>
+                </svg>
+                <h1>FLE Flashcards</h1>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="demo-card">
+            <div class="card-type">Vocabulaire</div>
+            <div class="card-image"></div>
+            <div class="card-content">
+                <span style="font-size: 32px;">🇫🇷</span>
+                <h2>Le pain</h2>
+                <p class="card-notes">Nom masculin - Un aliment de base</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="features">
+        <div class="features-grid">
+            <div class="feature">
+                <h3>📚 3 Types de Cartes</h3>
+                <p>Vocabulaire, Expressions et Conjugaisons pour un apprentissage complet</p>
+            </div>
+            <div class="feature">
+                <h3>🌍 Multilingue</h3>
+                <p>Anglais et Espagnol (Général, Mexique, Espagne)</p>
+            </div>
+            <div class="feature">
+                <h3>✨ Animations 3D</h3>
+                <p>Interface moderne avec effets visuels engageants</p>
+            </div>
+            <div class="feature">
+                <h3>⌨️ Navigation Clavier</h3>
+                <p>Raccourcis intuitifs pour une utilisation rapide</p>
+            </div>
+            <div class="feature">
+                <h3>🤖 Génération IA</h3>
+                <p>Création automatique de traductions</p>
+            </div>
+            <div class="feature">
+                <h3>🔊 Synthèse Vocale</h3>
+                <p>Prononciation dans toutes les langues</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cta">
+        <h2>Prêt à commencer ?</h2>
+        <p>Installez l'application et créez vos premières cartes de vocabulaire</p>
+        <a href="#" class="btn">Voir les instructions d'installation</a>
+    </div>
+</body>
+</html>

@@ -1169,3 +1169,83 @@ kbd {
     padding: 1rem;
   }
 }
+
+/* ==========================================
+   AMÉLIORATIONS MOBILE RESPONSIVE CRITIQUES
+   ========================================== */
+
+/* Améliorations header mobile */
+@media (max-width: 768px) {
+  .header {
+    padding: 0.5rem;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .logo h1 {
+    font-size: 1.5rem;
+  }
+
+  .language-selector {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .language-selector button {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+
+  .card-container {
+    max-width: 100%;
+    margin: 0 1rem;
+  }
+
+  .flashcard {
+    height: 350px;
+  }
+
+  .card-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .navigation {
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+
+  .tools {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .modal {
+    width: 95%;
+    max-width: none;
+    margin: 1rem;
+  }
+}
+
+/* Améliorations pour très petits écrans */
+@media (max-width: 480px) {
+  .tools {
+    grid-template-columns: 1fr;
+  }
+  
+  .navigation button {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .language-selector button {
+    padding: 0.4rem;
+    font-size: 0.75rem;
+  }
+}

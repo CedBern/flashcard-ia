@@ -117,25 +117,7 @@ function App() {
 
   // États pour les statistiques
   const [stats, setStats] = useState(() => {
-    const saved = localStorage.getItem('fleStats');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error('Erreur lors du chargement des stats:', e);
-      }
-    }
-    return {
-      totalCards: 0,
-      cardsViewed: 0,
-      cardsReviewed: 0,
-      totalStudyTime: 0,
-      averageResponseTime: 0,
-      streakDays: 0,
-      lastStudyDate: null,
-      cardStats: {}, // { cardId: { views: 0, correctAnswers: 0, avgTime: 0 } }
-      dailyStats: {} // { date: { cardsViewed: 0, studyTime: 0 } }
-    };
+    return loadStatsSecurely();
   });
 
   const [sessionStart, setSessionStart] = useState(Date.now());
@@ -162,6 +144,57 @@ function App() {
     const diffTime = current - last;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays === 1;
+  };
+
+  // ==========================================
+  // FONCTIONS DE SAUVEGARDE SÉCURISÉE DES STATISTIQUES
+  // ==========================================
+  const validateStats = (stats) => {
+    return {
+      cardsViewed: Number(stats.cardsViewed) || 0,
+      cardsReviewed: Number(stats.cardsReviewed) || 0,
+      totalStudyTime: Number(stats.totalStudyTime) || 0,
+      streakDays: Number(stats.streakDays) || 0,
+      averageResponseTime: Number(stats.averageResponseTime) || 0,
+      totalCards: Number(stats.totalCards) || 0,
+      lastStudyDate: stats.lastStudyDate || null,
+      cardStats: stats.cardStats || {},
+      dailyStats: stats.dailyStats || {}
+    };
+  };
+
+  const saveStatsSecurely = (stats) => {
+    try {
+      const validatedStats = validateStats(stats);
+      localStorage.setItem('fleStats', JSON.stringify(validatedStats));
+      return true;
+    } catch (error) {
+      console.error('Erreur sauvegarde stats:', error);
+      return false;
+    }
+  };
+
+  const loadStatsSecurely = () => {
+    try {
+      const saved = localStorage.getItem('fleStats');
+      if (saved) {
+        return validateStats(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.error('Erreur chargement stats:', error);
+    }
+    
+    return {
+      cardsViewed: 0,
+      cardsReviewed: 0,
+      totalStudyTime: 0,
+      streakDays: 0,
+      averageResponseTime: 0,
+      totalCards: 0,
+      lastStudyDate: null,
+      cardStats: {},
+      dailyStats: {}
+    };
   };
 
   // Fonctions de tracking des statistiques
@@ -251,10 +284,10 @@ function App() {
     localStorage.setItem('flePreferredLanguage', selectedLanguage);
   }, [selectedLanguage]);
 
-  // Sauvegarder les statistiques
+  // Sauvegarder les statistiques avec validation
   useEffect(() => {
-    localStorage.setItem('fleStats', JSON.stringify(stats));
-  }, [stats]);
+    saveStatsSecurely(stats);
+  }, [stats, saveStatsSecurely]);
 
   // Initialiser le temps de début de carte à chaque changement
   useEffect(() => {
@@ -434,69 +467,44 @@ function App() {
     setShowAddModal(true);
   };
 
-  // Génération automatique avec IA (simulation)
-  // Remplacez TOUTE votre fonction generateWithAI par celle-ci :
-const generateWithAI = async () => {
-  if (!newCard.french) {
-    alert('Veuillez entrer le texte en français d\'abord');
-    return;
-  }
-
-  setIsGenerating(true);
-  
-  try {
-    console.log('🔄 Traduction de:', newCard.french);
-    
-    // Traduction vers l'anglais avec MyMemory
-    const urlEn = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(newCard.french)}&langpair=fr|en`;
-    const responseEn = await fetch(urlEn);
-    const dataEn = await responseEn.json();
-    
-    // Traduction vers l'espagnol avec MyMemory
-    const urlEs = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(newCard.french)}&langpair=fr|es`;
-    const responseEs = await fetch(urlEs);
-    const dataEs = await responseEs.json();
-    
-    console.log('📥 Réponses reçues:', { 
-      english: dataEn.responseData?.translatedText,
-      spanish: dataEs.responseData?.translatedText 
-    });
-    
-    // Vérifier que les traductions sont valides
-    if (dataEn.responseData && dataEs.responseData) {
-      // Dictionnaire pour les variations régionales
-      const variations = {
-        'ordinateur': { mx: 'la computadora', es: 'el ordenador' },
-        'l\'ordinateur': { mx: 'la computadora', es: 'el ordenador' },
-        'portable': { mx: 'el celular', es: 'el móvil' },
-        'le portable': { mx: 'el celular', es: 'el móvil' },
-        'voiture': { mx: 'el carro', es: 'el coche' }
-      };
-
-      // Appliquer les variations régionales
-      const applyVariations = (text, lang) => {
-        const regionalTerms = variations[text];
-        return regionalTerms ? regionalTerms[lang] || text : text;
-      };
-
-      setNewCard({
-        ...newCard,
-        translations: {
-          english: applyVariations(dataEn.responseData.translatedText, 'english'),
-          spanish: applyVariations(dataEs.responseData.translatedText, 'spanish'),
-          spanishMexico: applyVariations(dataEs.responseData.translatedText, 'spanishMexico'),
-          spanishSpain: applyVariations(dataEs.responseData.translatedText, 'spanishSpain')
-        },
-        image: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=400',
-        notes: 'Généré automatiquement par IA'
-      });
+  // Génération automatique avec IA - Version optimisée
+  const generateWithAI = async () => {
+    if (!newCard.french) {
+      alert('Veuillez entrer le texte en français d\'abord');
+      return;
     }
-  } catch (error) {
-    console.error('Erreur lors de la génération avec l\'IA:', error);
-  } finally {
-    setIsGenerating(false);
-  }
-};
+
+    setIsGenerating(true);
+    
+    try {
+      // Traduction vers l'anglais avec MyMemory
+      const urlEn = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(newCard.french)}&langpair=fr|en`;
+      const responseEn = await fetch(urlEn);
+      const dataEn = await responseEn.json();
+      
+      // Traduction vers l'espagnol avec MyMemory
+      const urlEs = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(newCard.french)}&langpair=fr|es`;
+      const responseEs = await fetch(urlEs);
+      const dataEs = await responseEs.json();
+      
+      if (dataEn.responseData && dataEs.responseData) {
+        setNewCard({
+          ...newCard,
+          translations: {
+            english: dataEn.responseData.translatedText,
+            spanish: dataEs.responseData.translatedText,
+            spanishMexico: dataEs.responseData.translatedText,
+            spanishSpain: dataEs.responseData.translatedText
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Erreur génération:', error);
+      alert('Erreur lors de la génération. Veuillez réessayer.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
   // Fonction de synthèse vocale
   const speak = (text, lang) => {
     if ('speechSynthesis' in window) {
